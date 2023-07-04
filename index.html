@@ -3,9 +3,74 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="output.css" />
     <script defer src="script.js"></script>
     <title>Tic Tac Toe</title>
   </head>
-  <body></body>
+  <body>
+    <main>
+      <div class="bg-slate-600">
+        <h1 class="text-3xl text-center font-bold text-slate-200 p-6">
+          Tic Tac Toe
+        </h1>
+      </div>
+      <div
+        class="container mx-auto p-8 flex justify-around items-center w-full md:w-4/5 sm:w-3/5 lg:w-2/5"
+      >
+        <div class="rounded-full bg-slate-600 w-20 h-20 text-center relative">
+          <p class="relative top-1/2 -translate-y-1/2 text-4xl text-slate-100">
+            P1
+          </p>
+          <div
+            class="rounded-full h-10 w-10 bg-slate-200 absolute bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2"
+          >
+            <p
+              class="relative top-1/2 -translate-y-1/2 font-bold"
+              id="player1-symbol"
+            >
+              X
+            </p>
+          </div>
+        </div>
+        <div
+          class="bg-slate-600 text-center text-slate-200 rounded-xl py-6 px-8"
+        >
+          <h2 class="text-4xl">
+            <span id="player1-score">0</span>:<span id="player2-score">0</span>
+          </h2>
+        </div>
+        <div class="rounded-full bg-slate-600 w-20 h-20 text-center relative">
+          <p class="relative top-1/2 -translate-y-1/2 text-4xl text-slate-100">
+            P2
+          </p>
+          <div
+            class="rounded-full h-10 w-10 bg-slate-200 absolute bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2"
+          >
+            <p
+              class="relative top-1/2 -translate-y-1/2 font-bold"
+              id="player2-symbol"
+            >
+              O
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="container w-screen text-center py-4">
+        <p class="font-bold text-slate-800 text-3xl" id="player-turn">
+          <span id="current-player">Player 1</span>'s turn:
+        </p>
+      </div>
+      <div class="container mx-auto grid grid-cols-3 gap-2 w-80 h-80 py-4">
+        <div class="usr-input-btn">x</div>
+        <div class="usr-input-btn">o</div>
+        <div class="usr-input-btn">x</div>
+        <div class="usr-input-btn">o</div>
+        <div class="usr-input-btn">x</div>
+        <div class="usr-input-btn">o</div>
+        <div class="usr-input-btn">x</div>
+        <div class="usr-input-btn">o</div>
+        <div class="usr-input-btn">x</div>
+      </div>
+    </main>
+  </body>
 </html>
