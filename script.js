@@ -91,6 +91,9 @@ const userInterface = (() => {
   };
 
   const closeSettingForm = function () {
+    if (!errorMessageLabelEl.parentElement.classList.contains("hidden")) {
+      hideErrorMessage();
+    }
     settingFormEl.closest("#setting-form_overlay").classList.add("hidden");
   };
 
