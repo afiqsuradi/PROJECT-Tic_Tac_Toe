@@ -9,6 +9,18 @@
   </head>
   <body class="relative">
     <div
+      class="absolute h-full w-full flex justify-center items-center backdrop-blur z-10 hidden"
+      id="won-card_overlay"
+    >
+      <div
+        class="absolute h-fit w-fit flex justify-center items-center backdrop-blur z-10 opacity-0 bg-slate-200 py-4 px-10 rounded-xl"
+      >
+        <span class="text-3xl font-bold text-slate-600" id="player-won"
+          >Player 1 Won!</span
+        >
+      </div>
+    </div>
+    <div
       class="absolute h-full w-full flex justify-center items-center backdrop-blur z-10"
       id="setting-form_overlay"
     >
@@ -85,6 +97,25 @@
         </form>
       </div>
     </div>
+    <div
+      class="absolute h-full w-full flex justify-center items-center backdrop-blur z-10 hidden"
+      id="victor-card_overlay"
+    >
+      <div
+        class="absolute h-fit w-fit flex flex-col justify-center items-center gap-3 backdrop-blur z-10 opacity-0 bg-slate-200 py-4 px-10 rounded-xl"
+      >
+        <h1 class="font-bold underline text-2xl">Game Over!</h1>
+        <p id="victory">Total Victory!</p>
+        <div>
+          <a
+            href=""
+            id="new_game"
+            class="bg-sky-500 text-slate-100 w-fit py-1 px-3 rounded-md transition duration-200 hover:bg-slate-700 hover:scale-105 hover:cursor-pointer"
+            >New Game</a
+          >
+        </div>
+      </div>
+    </div>
     <main>
       <div class="bg-slate-600">
         <h1 class="text-3xl text-center font-bold text-slate-200 p-6">
@@ -103,7 +134,7 @@
           >
             <p
               class="relative top-1/2 -translate-y-1/2 font-bold"
-              id="player1-symbol"
+              id="player1_symbol"
             >
               X
             </p>
@@ -113,7 +144,7 @@
           class="bg-slate-600 text-center text-slate-200 rounded-xl py-6 px-8"
         >
           <h2 class="text-4xl">
-            <span id="player1-score">0</span>:<span id="player2-score">0</span>
+            <span id="player1_score">0</span>:<span id="player2_score">0</span>
           </h2>
         </div>
         <div class="rounded-full bg-slate-600 w-20 h-20 text-center relative">
@@ -125,7 +156,7 @@
           >
             <p
               class="relative top-1/2 -translate-y-1/2 font-bold"
-              id="player2-symbol"
+              id="player2_symbol"
             >
               O
             </p>

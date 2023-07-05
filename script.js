@@ -25,20 +25,56 @@ const userInterface = (() => {
   const errorMessageLabelEl = document.getElementById("setting-form_error");
   const boardContainerEl = document.getElementById("board_container");
   const playerTurnLabelEl = document.getElementById("current-player");
+  const winnerLabelEl = document.getElementById("player-won");
+  const victorLabelEl = document.getElementById("victory");
+  const newGameBtn = document.getElementById("new_game");
   const playerEl = [
     {
-      sign: document.getElementById("player1-symbol"),
-      score: document.getElementById("player1-score"),
+      sign: document.getElementById("player1_symbol"),
+      score: document.getElementById("player1_score"),
     },
     {
-      sign: document.getElementById("player2-symbol"),
-      score: document.getElementById("player2-score"),
+      sign: document.getElementById("player2_symbol"),
+      score: document.getElementById("player2_score"),
     },
   ];
 
   //
   //FUNCTIONS
   //
+
+  const getNewGameBtn = function () {
+    return newGameBtn;
+  };
+
+  const displayVictor = function (message) {
+    victorLabelEl.textContent = message;
+    victorLabelEl.textContent = message;
+    victorLabelEl.closest("#victor-card_overlay").classList.remove("hidden");
+    setTimeout(() => {
+      victorLabelEl.parentElement.classList.add("opacity-100");
+    }, 200);
+  };
+
+  const hideVictor = function () {
+    victorLabelEl.parentElement.classList.remove("opacity-100");
+    setTimeout(() => {
+      victorLabelEl.closest("#victor-card_overlay").classList.add("hidden");
+    }, 200);
+  };
+
+  const hideWinner = function () {
+    winnerLabelEl.closest("#won-card_overlay").classList.add("hidden");
+    winnerLabelEl.parentElement.classList.remove("opacity-100");
+  };
+  const displayWinner = function (message) {
+    winnerLabelEl.textContent = message;
+    winnerLabelEl.closest("#won-card_overlay").classList.remove("hidden");
+    setTimeout(() => {
+      winnerLabelEl.parentElement.classList.add("opacity-100");
+    }, 200);
+  };
+
   const updatePlayerTurn = function (id) {
     playerTurnLabelEl.textContent = `Player ${id}`;
   };
@@ -48,6 +84,10 @@ const userInterface = (() => {
   };
   const displayScore = function (id, score) {
     playerEl[id - 1].score.textContent = score;
+  };
+
+  const openSettingForm = function () {
+    settingFormEl.closest("#setting-form_overlay").classList.remove("hidden");
   };
 
   const closeSettingForm = function () {
@@ -88,9 +128,15 @@ const userInterface = (() => {
     resetSettingForm,
     getBoardContainer,
     closeSettingForm,
+    openSettingForm,
     displaySign,
     displayScore,
     updatePlayerTurn,
+    displayWinner,
+    hideWinner,
+    displayVictor,
+    hideVictor,
+    getNewGameBtn,
   };
 })();
 
@@ -148,6 +194,7 @@ const gameBoard = (() => {
   };
 
   const updateTile = function (id, sign) {
+    if (!isEnabled) return false;
     if (tiles[id].textContent.length === 1) return false;
     tiles[id].textContent = sign;
     return true;
@@ -176,6 +223,56 @@ const gameBoard = (() => {
 const gameLogic = (() => {
   let currentPlayerTurn = 1;
   const players = [];
+  let round = 0;
+  let moves = 0;
+
+  const getTotalWinner = function () {
+    if (players[0].getScore() === players[1].getScore()) {
+      return false;
+    }
+    return players[0].getScore() > players[1].getScore()
+      ? "Player 1"
+      : "Player 2";
+  };
+
+  const start = function () {
+    round++;
+    currentPlayerTurn = 1;
+    moves = 0;
+    gameBoard.resetTiles();
+    updateUi();
+    gameBoard.toggleGameBoard();
+  };
+
+  const reset = function () {
+    setTimeout(() => {
+      userInterface.hideWinner();
+      if (round == gameConfiguration.getMaxRound()) {
+        const victor = getTotalWinner();
+        if (victor) {
+          userInterface.displayVictor(`${victor} Total Victory!`);
+        } else {
+          userInterface.displayVictor("Game Tied!");
+        }
+        round = 0;
+        return;
+      }
+      start();
+    }, 2000);
+  };
+
+  const win = function () {
+    gameBoard.toggleGameBoard();
+    getPlayer(getCurrentPlayerTurn()).addScore();
+    userInterface.displayWinner(`Player ${getCurrentPlayerTurn()} Won!`);
+    reset();
+  };
+
+  const tie = function () {
+    gameBoard.toggleGameBoard();
+    userInterface.displayWinner(`Tied`);
+    reset();
+  };
 
   const checkWinner = function (sign) {
     for (const combination of gameBoard.getWinningCombination()) {
@@ -195,8 +292,12 @@ const gameLogic = (() => {
     const sign = getPlayer(getCurrentPlayerTurn()).getSign();
     if (!gameBoard.updateTile(id, sign)) return;
     if (checkWinner(sign)) {
-      getPlayer(getCurrentPlayerTurn()).addScore();
-      start();
+      win();
+      return;
+    }
+    if (moves === Math.pow(3, 2) - 1) {
+      tie();
+      return;
     }
     toggleCurrentPlayerTurn();
     updateUi();
@@ -205,11 +306,6 @@ const gameLogic = (() => {
   const setPlayer = function (id, sign) {
     // id should be only 1 and 2 indicate player1, player2
     if (id < 1 || id > 2) return;
-
-    //Check if the player already exist
-    if (players[id - 1]) {
-      players.splice(id - 1, 1);
-    }
     players.push(playerFactory(sign));
   };
 
@@ -220,6 +316,7 @@ const gameLogic = (() => {
 
   const toggleCurrentPlayerTurn = function () {
     currentPlayerTurn = currentPlayerTurn === 1 ? 2 : 1;
+    moves++;
   };
   const getCurrentPlayerTurn = function () {
     return currentPlayerTurn;
@@ -232,11 +329,6 @@ const gameLogic = (() => {
     }
     userInterface.updatePlayerTurn(getCurrentPlayerTurn());
   };
-  const start = function () {
-    gameBoard.resetTiles();
-    updateUi();
-    gameBoard.toggleGameBoard();
-  };
 
   userInterface.getSettingForm().addEventListener("submit", function (event) {
     event.preventDefault();
@@ -244,8 +336,8 @@ const gameLogic = (() => {
     const settingData = new FormData(event.target);
     const maxRound = settingData.get("max-round");
     const [player1Sign, player2Sign] = [
-      settingData.get("player1-symbol"),
-      settingData.get("player2-symbol"),
+      settingData.get("player1-symbol").toUpperCase(),
+      settingData.get("player2-symbol").toUpperCase(),
     ];
     // Check If Max Round Is Valid
     if (!gameConfiguration.setMaxRound(maxRound)) {
@@ -259,19 +351,26 @@ const gameLogic = (() => {
       );
       return;
     }
-    setPlayer(1, player1Sign.toUpperCase());
-    setPlayer(2, player2Sign.toUpperCase());
+    players.splice(0, players.length);
+    setPlayer(1, player1Sign);
+    setPlayer(2, player2Sign);
     start();
     userInterface.closeSettingForm();
   });
 
   userInterface.getBoardContainer().addEventListener("click", function (event) {
     // Check if board is enabled
-    if (!gameBoard.isEnabled) return;
+    if (!gameBoard.isEnabled()) return;
     const tile = event.target.closest(".game-tile");
     if (!tile) return;
     const id = tile.dataset.id;
     makeMove(id);
+  });
+
+  userInterface.getNewGameBtn().addEventListener("click", function (event) {
+    event.preventDefault();
+    userInterface.hideVictor();
+    userInterface.openSettingForm();
   });
 })();
 
